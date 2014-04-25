@@ -1,0 +1,24 @@
+
+.defaultCursor{
+	cursor: auto;
+}
+
+.revolverCursor{
+	cursor: url(http://s8.postimg.org/pd324azj5/animaatjes_guns_icon9.gif?noCache=1397638765),auto !important;
+}
+
+.boom{
+  font-family: 'Press Start 2P';
+  z-index:999999999999;
+  top:20%;
+  left:15%;
+  right:15%;
+  width:70%;
+  text-align: center;
+  position:fixed;
+  color:gray;
+  visibility: hidden;
+  text-shadow: -2px 0 #5E5E5E, 0 2px #5E5E5E, 2px 0 #5E5E5E, 0 -2px #5E5E5E;
+  font-size: 11em;
+
+}
