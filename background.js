@@ -2,14 +2,14 @@ var iconClicked=false;
 
 //Listen to if the icon has been clicked
 chrome.browserAction.onClicked.addListener(function(tab) {
-	console.log(iconClicked)
+	console.log("icon clicked: "+iconClicked)
 	if(iconClicked){
 		iconClicked=false;
 	}
 	else{
 	iconClicked=true;
 	}
-	
+	console.log("icon clicked send to content: "+iconClicked)
 	chrome.tabs.sendMessage(tab.id, iconClicked);
 
 });

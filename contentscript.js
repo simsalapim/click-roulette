@@ -5,16 +5,16 @@ $(document).ready(function() {
 	var timesClicked; //How many times links have been clicked
 	var clickedAudio; //Sound to play when a link gets clicked and it fires
 	var notClickedAudio; //Sound to play when a link gets clicked and it doesn't fire
-
+	var x;//coordinates
+	var y;//coordinates
+	var goTo; //href of clicked link
 
 	chrome.runtime.onMessage.addListener(function(message, sender) { //Receive information that the icon has been clicked from Background.js. If message=true the roulette has been started
-		console.log(message)
 		iconClicked=message; 
 		randomNumber=Math.floor(Math.random() * 7) + 1
 		timesClicked=0;
 		
 		if(firstTimeIconClicked){
-			//Here we do the stuff we only need to do the first time the icon is clicked
 			$("head").append("<link href='https://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'>"); //Load font for "BOOOM" text
 			$("body").append("<p class='boom'>BOOOM!</p>"); //Append the "BOOOM" text. It's hidden until a link has been clicked.
 		    
@@ -31,7 +31,6 @@ $(document).ready(function() {
 
 		//Change the cursors according to if the roulette is started or not
 		if(iconClicked){
-			console.log("changing cursors")
 			$("*").removeClass("defaultCursor")
 			$("*").addClass("revolverCursor")
 		}
@@ -42,33 +41,41 @@ $(document).ready(function() {
 	});
 
 
-	$( "a, button" ).click(function(e) { //listen to if any links or buttons get clicked
-		timesClicked+=1;
+	$("a, button").click(function(e) { 
 		if(iconClicked){ //Check if the roulette is started
-			if(timesClicked==randomNumber){
-				clickedAudio.play();
-				e.preventDefault(); //prevent from going directly to the link
-			    $(".boom").css("visibility","visible") //make "BOOOM" text visible
-			  	var goTo = this.getAttribute("href"); //Check where the link leads
-			    console.log(goTo)
-			    if(goTo=="null"){
-			    	goTo="#"
-			    }
-			    console.log(goTo)
+			timesClicked+=1;
 
+			if(timesClicked==randomNumber){
+				e.preventDefault(); //prevent from going directly to the link
+				clickedAudio.play();
+			    $(".boom").css("visibility","visible") //make "BOOOM" text visible
+				goTo = this.getAttribute("href"); //Check where the link leads
 			    setTimeout(function(){ 	//wait a moment before we go to the link
 					iconClicked=false;
 					chrome.runtime.sendMessage(iconClicked); //Send variable iconClicked to background.js 
-					if(goTo=="#"){ //If it's a link that doesn't takes the user to a new page
-			        	$(".boom").css("visibility","hidden")
-			        	$("*").removeClass("revolverCursor")		
-						$("*").addClass("defaultCursor")
-	  				}
-	  				else{ //If the link takes the user to a new page
-			        	window.location = goTo; //... then go to that link
-	  				}
-			    },800);       
+					$(".boom").css("visibility","hidden")
+		        	$("*").removeClass("revolverCursor")		
+					$("*").addClass("defaultCursor")
 
+					if(!goTo){ //if there's not a href, check what coordinates where clicked and then dispatch the event for those coordinates
+						if (e.pageX || e.pageY) { 
+						  x = e.pageX;
+						  y = e.pageY;
+						}
+						else { 
+						  x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+						  y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+						} 
+
+						var event = document.createEvent("MouseEvents");
+				    	event.initEvent("click", true, true);
+				    	document.elementFromPoint(x, y).dispatchEvent(event);
+			    	}
+			    	else{
+			    		window.location=goTo;
+			    	}
+
+			    },800);       
 
 			}
 			else{ //If the click shouldn't fire
